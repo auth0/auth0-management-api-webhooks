@@ -1,11 +1,12 @@
 {
   "title": "Auth0 Management API Webhooks",
-  "name": "auth0-management-api-webhooks",
+  "name": "auth0-webhooks",
   "version": "1.1.0",
   "author": "auth0",
   "description": "Allows you to define webhooks for Auth0's Management API. It will go through the audit logs and call a webhook for specific events.",
   "type": "cron",
-  "logoUrl": "https://cdn.auth0.com/extensions/auth0-management-api-webhooks/assets/logo.png",
+  "logoUrl": "https://cdn.auth0.com/extensions/auth0-webhooks/assets/logo.svg",
+  "repository": "https://github.com/auth0/auth0-management-api-webhooks",
   "keywords": [
     "auth0",
     "extension"
