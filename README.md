@@ -33,7 +33,7 @@ $ wt cron schedule \
     --secret WEBHOOK_CONCURRENT_CALLS="10" \
     --json \
     "*/5 * * * *" \
-    dist/auth0-webhooks-1.1.0.js
+    ./build/bundle.js
 ```
 
 > You can get your Global Client Id/Secret here: https://auth0.com/docs/api/v2
