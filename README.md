@@ -1,5 +1,7 @@
 # Auth0 Management API Webhooks
 
+[![Auth0 Extensions](http://cdn.auth0.com/extensions/assets/badge.svg)](https://sandbox.it.auth0.com/api/run/auth0-extensions/extensions-badge?webtask_no_cache=1)
+
 *Auth0 Management API Webhooks* allows you to enable webhooks for Auth0's Management API. It will go through the audit logs and call a webhook for specific events. This can address use cases like:
 
 > I want to call my own API each time a user is created or updated.
