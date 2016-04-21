@@ -1,7 +1,7 @@
 {
   "title": "Auth0 Management API Webhooks",
   "name": "auth0-webhooks",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "auth0",
   "description": "Allows you to define webhooks for Auth0's Management API. It will go through the audit logs and call a webhook for specific events.",
   "type": "cron",
@@ -12,15 +12,13 @@
     "extension"
   ],
   "schedule": "0 */5 * * * *",
+  "auth0": {
+    "scopes": "read:logs"
+  },
   "secrets": {
-    "AUTH0_DOMAIN": {
-      "description": "Auth0 domain"
-    },
-    "AUTH0_GLOBAL_CLIENT_ID": {
-      "description": "Auth0 global ClientID"
-    },
-    "AUTH0_GLOBAL_CLIENT_SECRET": {
-      "description": "Auth0 global ClientSecret"
+    "BATCH_SIZE": {
+      "description": "The ammount of logs to be read on each execution. Maximun is 100.",
+      "default": 100
     },
     "AUTH0_API_ENDPOINTS": {
       "description": "Allows you to filter specific API endpoints, comma separated.",

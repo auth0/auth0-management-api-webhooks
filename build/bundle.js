@@ -1,1 +1,713 @@
-module.exports=function(e){function t(o){if(n[o])return n[o].exports;var r=n[o]={exports:{},id:o,loaded:!1};return e[o].call(r.exports,r,r.exports,t),r.loaded=!0,r.exports}var n={};return t.m=e,t.c=n,t.p="/build/",t(0)}([function(e,t,n){(function(t){"use strict";function o(e,n){var o=e.webtaskContext,u=["AUTH0_DOMAIN","AUTH0_GLOBAL_CLIENT_ID","AUTH0_GLOBAL_CLIENT_SECRET","WEBHOOK_URL"],l=u.filter(function(e){return!o.data[e]});return l.length?n.status(400).send({message:"Missing settings: "+l.join(", ")}):void e.webtaskContext.storage.get(function(u,l){if(u&&404!==u.output.statusCode)return n.status(u.code).send(u);var a="undefined"==typeof l?null:l.checkpointId,c=new r({domain:o.data.AUTH0_DOMAIN,clientID:o.data.AUTH0_GLOBAL_CLIENT_ID,clientSecret:o.data.AUTH0_GLOBAL_CLIENT_SECRET});s.waterfall([function(e){console.log("STEP 1: Getting access token"),c.getAccessToken(function(t){return t&&console.log("Error authenticating:",t),e(t)})},function(e){console.log("STEP 2: Downloading logs");var n=function o(n){console.log("Downloading logs from: "+(n.checkpointId||"Start")+"."),n.logs=n.logs||[],c.getLogs({take:200,from:n.checkpointId},function(r,i){return r?e(r):i&&i.length?(i.forEach(function(e){return n.logs.push(e)}),n.checkpointId=n.logs[n.logs.length-1]._id,t(function(){return o(n)})):(console.log("Total logs: "+n.logs.length+"."),e(null,n))})};n({checkpointId:a})},function(e,t){console.log("STEP 3: Filtering logs");var n=o.data.AUTH0_API_ENDPOINTS.split(","),r=function(e){return n&&n.length?e.details.request&&e.details.request.path&&n.some(function(t){return e.details.request.path==="/api/v2/"+t||e.details.request.path.indexOf("/api/v2/"+t+"/")>=0}):!0};e.logs=e.logs.filter(function(e){return"sapi"===e.type||"fapi"===e.type}).filter(r).map(function(e){return{date:e.date,request:e.details.request,response:e.details.response}}),o.data.AUTH0_API_ENDPOINTS&&console.log("Filtered logs on '"+o.data.AUTH0_API_ENDPOINTS+"': "+e.logs.length+"."),t(null,e)},function(e,t){if(console.log("STEP 4: Sending information"),!e.logs.length)return t(null,e);var n=o.data.WEBHOOK_URL,r=o.data.WEBHOOK_CONCURRENT_CALLS||5;console.log("Sending to '"+n+"' with "+r+" concurrent calls."),s.eachLimit(e.logs,r,function(e,t){i.post(n).send(e).set("Content-Type","application/json").end(function(e,n){return e?(console.log("Error sending request:",e),t(e)):n.ok?void t():(console.log("Unexpected response while sending request:",JSON.stringify(n.body)),t(new Error("Unexpected response from webhook.")))})},function(n){return n?t(n):(console.log("Upload complete."),t(null,e))})}],function(t,o){return t?(console.log("Job failed."),e.webtaskContext.storage.set({checkpointId:a},{force:1},function(e){return e?n.status(500).send(e):void n.status(500).send({error:t})})):(console.log("Job complete."),e.webtaskContext.storage.set({checkpointId:o.checkpointId,totalLogsProcessed:o.logs.length},{force:1},function(e){return e?n.status(500).send(e):void n.sendStatus(200)}))})})}var r=n(3),i=n(4),s=n(5),u=n(6),l=n(7),a=u();a.get("/",o),a.post("/",o),e.exports=l.fromExpress(a)}).call(t,n(1).setImmediate)},function(e,t,n){(function(e,o){function r(e,t){this._id=e,this._clearFn=t}var i=n(2).nextTick,s=Function.prototype.apply,u=Array.prototype.slice,l={},a=0;t.setTimeout=function(){return new r(s.call(setTimeout,window,arguments),clearTimeout)},t.setInterval=function(){return new r(s.call(setInterval,window,arguments),clearInterval)},t.clearTimeout=t.clearInterval=function(e){e.close()},r.prototype.unref=r.prototype.ref=function(){},r.prototype.close=function(){this._clearFn.call(window,this._id)},t.enroll=function(e,t){clearTimeout(e._idleTimeoutId),e._idleTimeout=t},t.unenroll=function(e){clearTimeout(e._idleTimeoutId),e._idleTimeout=-1},t._unrefActive=t.active=function(e){clearTimeout(e._idleTimeoutId);var t=e._idleTimeout;t>=0&&(e._idleTimeoutId=setTimeout(function(){e._onTimeout&&e._onTimeout()},t))},t.setImmediate="function"==typeof e?e:function(e){var n=a++,o=arguments.length<2?!1:u.call(arguments,1);return l[n]=!0,i(function(){l[n]&&(o?e.apply(null,o):e.call(null),t.clearImmediate(n))}),n},t.clearImmediate="function"==typeof o?o:function(e){delete l[e]}}).call(t,n(1).setImmediate,n(1).clearImmediate)},function(e,t){function n(){a=!1,s.length?l=s.concat(l):c=-1,l.length&&o()}function o(){if(!a){var e=setTimeout(n);a=!0;for(var t=l.length;t;){for(s=l,l=[];++c<t;)s&&s[c].run();c=-1,t=l.length}s=null,a=!1,clearTimeout(e)}}function r(e,t){this.fun=e,this.array=t}function i(){}var s,u=e.exports={},l=[],a=!1,c=-1;u.nextTick=function(e){var t=new Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)t[n-1]=arguments[n];l.push(new r(e,t)),1!==l.length||a||setTimeout(o,0)},r.prototype.run=function(){this.fun.apply(null,this.array)},u.title="browser",u.browser=!0,u.env={},u.argv=[],u.version="",u.versions={},u.on=i,u.addListener=i,u.once=i,u.off=i,u.removeListener=i,u.removeAllListeners=i,u.emit=i,u.binding=function(e){throw new Error("process.binding is not supported")},u.cwd=function(){return"/"},u.chdir=function(e){throw new Error("process.chdir is not supported")},u.umask=function(){return 0}},function(e,t){e.exports=require("auth0@0.8.2")},function(e,t){e.exports=require("superagent")},function(e,t){e.exports=require("async")},function(e,t){e.exports=require("express")},function(e,t,n){function o(e){return function(t,n,o){var r=s(n.x_wt.jtn);return n.originalUrl=n.url,n.url=n.url.replace(r,"/"),n.webtaskContext=u(t),e(n,o)}}function r(e){var t;return e.ext("onRequest",function(e,n){var o=s(e.x_wt.jtn);e.setUrl(e.url.replace(o,"/")),e.webtaskContext=t}),function(n,o,r){var i=e._dispatch();t=u(n),i(o,r)}}function i(e){return function(t,n,o){var r=s(n.x_wt.jtn);return n.originalUrl=n.url,n.url=n.url.replace(r,"/"),n.webtaskContext=u(t),e.emit("request",n,o)}}function s(e){var t="^/api/run/[^/]+/",n="(?:[^/?#]*/?)?";return new RegExp(t+(e?n:""))}function u(e){function t(e,t,o){var r=n(8);"function"==typeof t&&(o=t,t={}),o(r.preconditionFailed("Storage is not available in this context"))}function o(t,o,r){var i=n(8),s=n(9);"function"==typeof o&&(r=o,o={}),s({uri:e.secrets.EXT_STORAGE_URL,method:"GET",headers:o.headers||{},qs:{path:t},json:!0},function(e,t,n){return e?r(i.wrap(e,502)):404===t.statusCode&&Object.hasOwnProperty.call(o,"defaultValue")?r(null,o.defaultValue):t.statusCode>=400?r(i.create(t.statusCode,n&&n.message)):void r(null,n)})}function r(e,t,o,r){var i=n(8);"function"==typeof o&&(r=o,o={}),r(i.preconditionFailed("Storage is not available in this context"))}function i(t,o,r,i){var s=n(8),u=n(9);"function"==typeof r&&(i=r,r={}),u({uri:e.secrets.EXT_STORAGE_URL,method:"PUT",headers:r.headers||{},qs:{path:t},body:o},function(e,t,n){return e?i(s.wrap(e,502)):t.statusCode>=400?i(s.create(t.statusCode,n&&n.message)):void i(null)})}return e.read=e.secrets.EXT_STORAGE_URL?o:t,e.write=e.secrets.EXT_STORAGE_URL?i:r,e}t.fromConnect=t.fromExpress=o,t.fromHapi=r,t.fromServer=t.fromRestify=i},function(e,t){e.exports=require("boom")},function(e,t){e.exports=require("request")}]);
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/build/";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var Auth0 = __webpack_require__(1);
+	var request = __webpack_require__(2);
+	var async = __webpack_require__(3);
+	var express = __webpack_require__(4);
+	var Webtask = __webpack_require__(5);
+	var app = express();
+	var Request = __webpack_require__(2);
+	var memoizer = __webpack_require__(8);
+
+	function lastLogCheckpoint(req, res) {
+	  var ctx = req.webtaskContext;
+	  var required_settings = ['AUTH0_DOMAIN', 'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'WEBHOOK_URL'];
+	  var missing_settings = required_settings.filter(function (setting) {
+	    return !ctx.data[setting];
+	  });
+
+	  if (missing_settings.length) {
+	    return res.status(400).send({ message: 'Missing settings: ' + missing_settings.join(', ') });
+	  }
+
+	  // If this is a scheduled task, we'll get the last log checkpoint from the previous run and continue from there.
+	  req.webtaskContext.storage.get(function (err, data) {
+	    if (err && err.output.statusCode !== 404) return res.status(err.code).send(err);
+
+	    var startCheckpointId = typeof data === 'undefined' ? null : data.checkpointId;
+
+	    // Start the process.
+	    async.waterfall([function (callback) {
+	      var getLogs = function getLogs(context) {
+	        console.log('Logs from: ' + (context.checkpointId || 'Start') + '.');
+
+	        var take = Number.parseInt(ctx.data.BATCH_SIZE);
+
+	        take = take > 100 ? 100 : take;
+
+	        context.logs = context.logs || [];
+
+	        getLogsFromAuth0(req.webtaskContext.data.AUTH0_DOMAIN, req.access_token, take, context.checkpointId, function (logs, err) {
+	          if (err) {
+	            console.log('Error getting logs from Auth0', err);
+	            return callback(err);
+	          }
+
+	          if (logs && logs.length) {
+	            logs.forEach(function (l) {
+	              return context.logs.push(l);
+	            });
+	            context.checkpointId = context.logs[context.logs.length - 1]._id;
+	          }
+
+	          console.log('Total logs: ' + context.logs.length + '.');
+	          return callback(null, context);
+	        });
+	      };
+
+	      getLogs({ checkpointId: startCheckpointId });
+	    }, function (context, callback) {
+	      var endpoints_filter = ctx.data.AUTH0_API_ENDPOINTS.split(',');
+	      var request_matches_filter = function request_matches_filter(log) {
+	        if (!endpoints_filter || !endpoints_filter.length) return true;
+	        return log.details.request && log.details.request.path && endpoints_filter.some(function (f) {
+	          return log.details.request.path === '/api/v2/' + f || log.details.request.path.indexOf('/api/v2/' + f + '/') >= 0;
+	        });
+	      };
+
+	      context.logs = context.logs.filter(function (l) {
+	        return l.type === 'sapi' || l.type === 'fapi';
+	      }).filter(request_matches_filter).map(function (l) {
+	        return {
+	          date: l.date,
+	          request: l.details.request,
+	          response: l.details.response
+	        };
+	      });
+
+	      callback(null, context);
+	    },
+	    //// STEP 4: Sending information
+	    function (context, callback) {
+	      if (!context.logs.length) {
+	        return callback(null, context);
+	      }
+
+	      var url = ctx.data.WEBHOOK_URL;
+	      var concurrent_calls = ctx.data.WEBHOOK_CONCURRENT_CALLS || 5;
+
+	      console.log('Sending to \'' + url + '\' with ' + concurrent_calls + ' concurrent calls.');
+
+	      async.eachLimit(context.logs, concurrent_calls, function (log, cb) {
+	        request.post(url).send(log).set('Content-Type', 'application/json').end(function (err, res) {
+	          if (err) {
+	            console.log('Error sending request:', err);
+	            return cb(err);
+	          }
+
+	          if (!res.ok) {
+	            console.log('Unexpected response while sending request:', JSON.stringify(res.body));
+	            return cb(new Error('Unexpected response from webhook.'));
+	          }
+
+	          cb();
+	        });
+	      }, function (err) {
+	        if (err) {
+	          return callback(err);
+	        }
+
+	        console.log('Upload complete.');
+	        return callback(null, context);
+	      });
+	    }], function (err, context) {
+	      if (err) {
+	        console.log('Job failed.');
+
+	        return req.webtaskContext.storage.set({ checkpointId: startCheckpointId }, { force: 1 }, function (error) {
+	          if (error) {
+	            console.log('Error storing startCheckpoint', error);
+	            return res.status(500).send({ error: error });
+	          }
+
+	          res.status(500).send({
+	            error: err
+	          });
+	        });
+	      }
+
+	      console.log('Job complete.');
+
+	      return req.webtaskContext.storage.set({
+	        checkpointId: context.checkpointId,
+	        totalLogsProcessed: context.logs.length
+	      }, { force: 1 }, function (error) {
+	        if (error) {
+	          console.log('Error storing checkpoint', error);
+	          return res.status(500).send({ error: error });
+	        }
+
+	        res.sendStatus(200);
+	      });
+	    });
+	  });
+	}
+
+	app.get('/', lastLogCheckpoint);
+	app.post('/', lastLogCheckpoint);
+
+	function getLogsFromAuth0(domain, token, take, from, cb) {
+	  var url = 'https://' + domain + '/api/v2/logs';
+
+	  Request.get(url).set('Authorization', 'Bearer ' + token).set('Accept', 'application/json').query({ take: take }).query({ from: from }).query({ sort: 'date:1' }).query({ per_page: take }).end(function (err, res) {
+	    if (err || !res.ok) {
+	      console.log('Error getting logs', err);
+	      cb(null, err);
+	    } else {
+	      console.log('x-ratelimit-limit: ', res.headers['x-ratelimit-limit']);
+	      console.log('x-ratelimit-remaining: ', res.headers['x-ratelimit-remaining']);
+	      console.log('x-ratelimit-reset: ', res.headers['x-ratelimit-reset']);
+	      cb(res.body);
+	    }
+	  });
+	}
+
+	var getTokenCached = memoizer({
+	  load: function load(apiUrl, audience, clientId, clientSecret, cb) {
+	    Request.post(apiUrl).send({
+	      audience: audience,
+	      grant_type: 'client_credentials',
+	      client_id: clientId,
+	      client_secret: clientSecret
+	    }).type('application/json').end(function (err, res) {
+	      if (err || !res.ok) {
+	        cb(null, err);
+	      } else {
+	        cb(res.body.access_token);
+	      }
+	    });
+	  },
+	  hash: function hash(apiUrl) {
+	    return apiUrl;
+	  },
+	  max: 100,
+	  maxAge: 1000 * 60 * 60
+	});
+
+	app.use(function (req, res, next) {
+	  var apiUrl = 'https://' + req.webtaskContext.data.AUTH0_DOMAIN + '/oauth/token';
+	  var audience = 'https://' + req.webtaskContext.data.AUTH0_DOMAIN + '/api/v2/';
+	  var clientId = req.webtaskContext.data.AUTH0_CLIENT_ID;
+	  var clientSecret = req.webtaskContext.data.AUTH0_CLIENT_SECRET;
+
+	  getTokenCached(apiUrl, audience, clientId, clientSecret, function (access_token, err) {
+	    if (err) {
+	      console.log('Error getting access_token', err);
+	      return next(err);
+	    }
+
+	    req.access_token = access_token;
+	    next();
+	  });
+	});
+
+	module.exports = Webtask.fromExpress(app);
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	module.exports = require("auth0@0.8.2");
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	module.exports = require("superagent");
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	module.exports = require("async");
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	module.exports = require("express");
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports.fromConnect = exports.fromExpress = fromConnect;
+	exports.fromHapi = fromHapi;
+	exports.fromServer = exports.fromRestify = fromServer;
+
+
+	// API functions
+
+	function fromConnect (connectFn) {
+	    return function (context, req, res) {
+	        var normalizeRouteRx = createRouteNormalizationRx(req.x_wt.jtn);
+
+	        req.originalUrl = req.url;
+	        req.url = req.url.replace(normalizeRouteRx, '/');
+	        req.webtaskContext = attachStorageHelpers(context);
+
+	        return connectFn(req, res);
+	    };
+	}
+
+	function fromHapi(server) {
+	    var webtaskContext;
+
+	    server.ext('onRequest', function (request, response) {
+	        var normalizeRouteRx = createRouteNormalizationRx(request.x_wt.jtn);
+
+	        request.setUrl(request.url.replace(normalizeRouteRx, '/'));
+	        request.webtaskContext = webtaskContext;
+	    });
+
+	    return function (context, req, res) {
+	        var dispatchFn = server._dispatch();
+
+	        webtaskContext = attachStorageHelpers(context);
+
+	        dispatchFn(req, res);
+	    };
+	}
+
+	function fromServer(httpServer) {
+	    return function (context, req, res) {
+	        var normalizeRouteRx = createRouteNormalizationRx(req.x_wt.jtn);
+
+	        req.originalUrl = req.url;
+	        req.url = req.url.replace(normalizeRouteRx, '/');
+	        req.webtaskContext = attachStorageHelpers(context);
+
+	        return httpServer.emit('request', req, res);
+	    };
+	}
+
+
+	// Helper functions
+
+	function createRouteNormalizationRx(jtn) {
+	    var normalizeRouteBase = '^\/api\/run\/[^\/]+\/';
+	    var normalizeNamedRoute = '(?:[^\/\?#]*\/?)?';
+
+	    return new RegExp(
+	        normalizeRouteBase + (
+	        jtn
+	            ?   normalizeNamedRoute
+	            :   ''
+	    ));
+	}
+
+	function attachStorageHelpers(context) {
+	    context.read = context.secrets.EXT_STORAGE_URL
+	        ?   readFromPath
+	        :   readNotAvailable;
+	    context.write = context.secrets.EXT_STORAGE_URL
+	        ?   writeToPath
+	        :   writeNotAvailable;
+
+	    return context;
+
+
+	    function readNotAvailable(path, options, cb) {
+	        var Boom = __webpack_require__(6);
+
+	        if (typeof options === 'function') {
+	            cb = options;
+	            options = {};
+	        }
+
+	        cb(Boom.preconditionFailed('Storage is not available in this context'));
+	    }
+
+	    function readFromPath(path, options, cb) {
+	        var Boom = __webpack_require__(6);
+	        var Request = __webpack_require__(7);
+
+	        if (typeof options === 'function') {
+	            cb = options;
+	            options = {};
+	        }
+
+	        Request({
+	            uri: context.secrets.EXT_STORAGE_URL,
+	            method: 'GET',
+	            headers: options.headers || {},
+	            qs: { path: path },
+	            json: true,
+	        }, function (err, res, body) {
+	            if (err) return cb(Boom.wrap(err, 502));
+	            if (res.statusCode === 404 && Object.hasOwnProperty.call(options, 'defaultValue')) return cb(null, options.defaultValue);
+	            if (res.statusCode >= 400) return cb(Boom.create(res.statusCode, body && body.message));
+
+	            cb(null, body);
+	        });
+	    }
+
+	    function writeNotAvailable(path, data, options, cb) {
+	        var Boom = __webpack_require__(6);
+
+	        if (typeof options === 'function') {
+	            cb = options;
+	            options = {};
+	        }
+
+	        cb(Boom.preconditionFailed('Storage is not available in this context'));
+	    }
+
+	    function writeToPath(path, data, options, cb) {
+	        var Boom = __webpack_require__(6);
+	        var Request = __webpack_require__(7);
+
+	        if (typeof options === 'function') {
+	            cb = options;
+	            options = {};
+	        }
+
+	        Request({
+	            uri: context.secrets.EXT_STORAGE_URL,
+	            method: 'PUT',
+	            headers: options.headers || {},
+	            qs: { path: path },
+	            body: data,
+	        }, function (err, res, body) {
+	            if (err) return cb(Boom.wrap(err, 502));
+	            if (res.statusCode >= 400) return cb(Boom.create(res.statusCode, body && body.message));
+
+	            cb(null);
+	        });
+	    }
+	}
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = require("boom");
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	module.exports = require("request");
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(setImmediate) {const LRU = __webpack_require__(11);
+	const _ = __webpack_require__(12);
+	const lru_params =  [ 'max', 'maxAge', 'length', 'dispose', 'stale' ];
+
+	module.exports = function (options) {
+	  var cache = new LRU(_.pick(options, lru_params));
+	  var load = options.load;
+	  var hash = options.hash;
+
+	  var result = function () {
+	    var args = _.toArray(arguments);
+	    var parameters = args.slice(0, -1);
+	    var callback = args.slice(-1).pop();
+
+	    var key;
+
+	    if (parameters.length === 0 && !hash) {
+	      //the load function only receives callback.
+	      key = '_';
+	    } else {
+	      key = hash.apply(options, parameters);
+	    }
+
+	    var fromCache = cache.get(key);
+
+	    if (fromCache) {
+	      return setImmediate.apply(null, [callback, null].concat(fromCache));
+	    }
+
+	    load.apply(null, parameters.concat(function (err) {
+	      if (err) {
+	        return callback(err);
+	      }
+
+	      cache.set(key, _.toArray(arguments).slice(1));
+
+	      return callback.apply(null, arguments);
+
+	    }));
+
+	  };
+
+	  result.keys = cache.keys.bind(cache);
+
+	  return result;
+	};
+
+
+	module.exports.sync = function (options) {
+	  var cache = new LRU(_.pick(options, lru_params));
+	  var load = options.load;
+	  var hash = options.hash;
+
+	  var result = function () {
+	    var args = _.toArray(arguments);
+
+	    var key = hash.apply(options, args);
+
+	    var fromCache = cache.get(key);
+
+	    if (fromCache) {
+	      return fromCache;
+	    }
+
+	    var result = load.apply(null, args);
+
+	    cache.set(key, result);
+
+	    return result;
+	  };
+
+	  result.keys = cache.keys.bind(cache);
+
+	  return result;
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9).setImmediate))
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(10).nextTick;
+	var apply = Function.prototype.apply;
+	var slice = Array.prototype.slice;
+	var immediateIds = {};
+	var nextImmediateId = 0;
+
+	// DOM APIs, for completeness
+
+	exports.setTimeout = function() {
+	  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+	};
+	exports.setInterval = function() {
+	  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+	};
+	exports.clearTimeout =
+	exports.clearInterval = function(timeout) { timeout.close(); };
+
+	function Timeout(id, clearFn) {
+	  this._id = id;
+	  this._clearFn = clearFn;
+	}
+	Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+	Timeout.prototype.close = function() {
+	  this._clearFn.call(window, this._id);
+	};
+
+	// Does not start the time, just sets up the members needed.
+	exports.enroll = function(item, msecs) {
+	  clearTimeout(item._idleTimeoutId);
+	  item._idleTimeout = msecs;
+	};
+
+	exports.unenroll = function(item) {
+	  clearTimeout(item._idleTimeoutId);
+	  item._idleTimeout = -1;
+	};
+
+	exports._unrefActive = exports.active = function(item) {
+	  clearTimeout(item._idleTimeoutId);
+
+	  var msecs = item._idleTimeout;
+	  if (msecs >= 0) {
+	    item._idleTimeoutId = setTimeout(function onTimeout() {
+	      if (item._onTimeout)
+	        item._onTimeout();
+	    }, msecs);
+	  }
+	};
+
+	// That's not how node.js implements it but the exposed api is the same.
+	exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+	  var id = nextImmediateId++;
+	  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+	  immediateIds[id] = true;
+
+	  nextTick(function onNextTick() {
+	    if (immediateIds[id]) {
+	      // fn.call() is faster so we optimize for the common use-case
+	      // @see http://jsperf.com/call-apply-segu
+	      if (args) {
+	        fn.apply(null, args);
+	      } else {
+	        fn.call(null);
+	      }
+	      // Prevent ids from leaking
+	      exports.clearImmediate(id);
+	    }
+	  });
+
+	  return id;
+	};
+
+	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+	  delete immediateIds[id];
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9).setImmediate, __webpack_require__(9).clearImmediate))
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	// shim for using process in browser
+
+	var process = module.exports = {};
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+
+	function cleanUpNextTick() {
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = setTimeout(cleanUpNextTick);
+	    draining = true;
+
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    clearTimeout(timeout);
+	}
+
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        setTimeout(drainQueue, 0);
+	    }
+	};
+
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+
+	function noop() {}
+
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	module.exports = require("lru-cache");
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	module.exports = require("lodash");
+
+/***/ }
+/******/ ]);
