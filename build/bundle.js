@@ -190,9 +190,6 @@ module.exports =
 	  });
 	}
 
-	app.get('/', lastLogCheckpoint);
-	app.post('/', lastLogCheckpoint);
-
 	function getLogsFromAuth0(domain, token, take, from, cb) {
 	  var url = 'https://' + domain + '/api/v2/logs';
 
@@ -247,6 +244,9 @@ module.exports =
 	    next();
 	  });
 	});
+
+	app.get('/', lastLogCheckpoint);
+	app.post('/', lastLogCheckpoint);
 
 	module.exports = Webtask.fromExpress(app);
 

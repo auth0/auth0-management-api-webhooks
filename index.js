@@ -146,9 +146,6 @@ function lastLogCheckpoint(req, res) {
   });
 }
 
-app.get ('/', lastLogCheckpoint);
-app.post('/', lastLogCheckpoint);
-
 function getLogsFromAuth0(domain, token, take, from, cb) {
   var url = `https://${domain}/api/v2/logs`;
 
@@ -213,5 +210,8 @@ app.use(function (req, res, next) {
     next();
   });
 });
+
+app.get ('/', lastLogCheckpoint);
+app.post('/', lastLogCheckpoint);
 
 module.exports = Webtask.fromExpress(app);
