@@ -51,7 +51,8 @@ function lastLogCheckpoint(req, res) {
         getLogs({ checkpointId: startCheckpointId });
       },
       (context, callback) => {
-        const endpoints_filter = ctx.data.AUTH0_API_ENDPOINTS.split(',');
+        let endpoints_filter = ctx.data.AUTH0_API_ENDPOINTS.split(',');
+        endpoints_filter = endpoints_filter.length > 0 && endpoints_filter[0] === '' ? [] : endpoints_filter;
         const request_matches_filter = (log) => {
           if (!endpoints_filter || !endpoints_filter.length) return true;
           return log.details.request && log.details.request.path &&
