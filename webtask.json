@@ -30,6 +30,15 @@
     "WEBHOOK_CONCURRENT_CALLS":     {
       "description": "The maximum concurrent calls that will be made to your webhook",
       "default": 5
+    },
+    "WEBHOOK_AUTH_CLIENT_ID": {
+      "description": "The client id for generating an access token to call the WEBHOOK_URL"
+    },
+    "WEBHOOK_AUTH_CLIENT_SECRET": {
+      "description": "The client secret for generating an access token to call the WEBHOOK_URL"
+    },
+    "WEBHOOK_AUTH_RESOURCE_SERVER": {
+      "description": "The resource server issuing the access token to call the WEBHOOK_URL"
     }
   }
 }

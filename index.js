@@ -74,6 +74,18 @@ function lastLogCheckpoint(req, res) {
 
         callback(null, context);
       },
+      // Get authentication token if requested
+      (context, callback) => {
+        if (ctx.data.WEBHOOK_AUTH_CLIENT_ID && ctx.data.WEBHOOK_AUTH_CLIENT_SECRET && ctx.data.WEBHOOK_AUTH_RESOURCE_SERVER) {
+          getTokenCached(`https://${ctx.data.AUTH0_DOMAIN}/oauth/token`, ctx.data.WEBHOOK_AUTH_RESOURCE_SERVER, ctx.data.WEBHOOK_AUTH_CLIENT_ID, ctx.data.WEBHOOK_AUTH_CLIENT_SECRET, (access_token, err) => {
+            if (err) return callback(err)
+            else {
+              context.headers = { authorization: `Bearer ${access_token}` }
+              return callback(null, context)
+            }
+          })
+        } else return callback(null, context)
+      },
       //// STEP 4: Sending information
       (context, callback) => {
         if (!context.logs.length) {
@@ -90,7 +102,8 @@ function lastLogCheckpoint(req, res) {
             method: 'POST',
             url: url,
             json: true,
-            body: log
+            body: log,
+            headers: context.headers
           }, (err, res, body) => {
             if (err) {
               console.log('Error sending request:', err);
