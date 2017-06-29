@@ -13,11 +13,13 @@
   ],
   "schedule": "0 */5 * * * *",
   "auth0": {
-    "scopes": "read:logs"
+    "createClient": true,
+    "onUninstallPath": "/.extensions/on-uninstall",
+    "scopes": "read:logs delete:clients"
   },
   "secrets": {
     "BATCH_SIZE": {
-      "description": "The ammount of logs to be read on each execution. Maximun is 100.",
+      "description": "The amount of logs to be read on each execution. Maximum is 100.",
       "default": 100
     },
     "AUTH0_API_ENDPOINTS": {
