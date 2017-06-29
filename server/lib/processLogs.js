@@ -1,5 +1,6 @@
 const async = require('async');
 const moment = require('moment');
+const Request  = require('request');
 const loggingTools = require('auth0-log-extension-tools');
 
 const config = require('./config');
@@ -55,6 +56,7 @@ module.exports = (storage) =>
       const url = config('WEBHOOK_URL');
       const concurrentCalls = parseInt(config('WEBHOOK_CONCURRENT_CALLS'), 10) || 5;
 
+      logger.info(`${filteredLogs.length} logs found.`);
       logger.info(`Sending to '${url}' with ${concurrentCalls} concurrent calls.`);
 
       async.eachLimit(filteredLogs, concurrentCalls, (log, cb) => {
@@ -74,7 +76,10 @@ module.exports = (storage) =>
           }
 
           cb();
-        }, callback);
+        });
+      }, () => {
+        logger.info(`${webhookReport.calls} requests processed.`)
+        callback();
       });
     };
 

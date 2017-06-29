@@ -16,11 +16,7 @@ export default class LogsDialog extends Component {
 
     const log = this.props.log;
 
-    let message = `checkpoint: ${log.checkpoint}\nstart: ${log.start}\nend: ${log.end}\nlogsProcessed: ${log.logsProcessed}\n`;
-
-    if (log.error) {
-      message += `error: ${JSON.stringify(log.error)}\n`
-    }
+    let message = JSON.stringify(log, null, ' ');
 
     return (
       <Modal dialogClassName="logs-dialog" show={this.props.log !== null} onHide={this.props.onClose}>

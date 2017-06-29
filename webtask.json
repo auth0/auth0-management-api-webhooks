@@ -5,6 +5,7 @@
   "author": "auth0",
   "description": "Allows you to define webhooks for Auth0's Management API. It will go through the audit logs and call a webhook for specific events.",
   "type": "cron",
+  "initialUrlPath": "/login",
   "logoUrl": "https://cdn.auth0.com/extensions/auth0-webhooks/assets/logo.svg",
   "repository": "https://github.com/auth0/auth0-management-api-webhooks",
   "keywords": [
@@ -32,6 +33,28 @@
     "WEBHOOK_CONCURRENT_CALLS":     {
       "description": "The maximum concurrent calls that will be made to your webhook",
       "default": 5
+    },
+    "START_FROM": {
+      "description": "Checkpoint ID of log to start from."
+    },
+    "SLACK_INCOMING_WEBHOOK_URL": {
+      "description": "Slack Incoming Webhook URL used to report statistics and possible failures"
+    },
+    "SLACK_SEND_SUCCESS": {
+      "description": "This setting will enable verbose notifications to Slack which are useful for troubleshooting",
+      "type": "select",
+      "allowMultiple": false,
+      "default": "false",
+      "options": [
+        {
+          "value": "false",
+          "text": "No"
+        },
+        {
+          "value": "true",
+          "text": "Yes"
+        }
+      ]
     }
   }
 }
