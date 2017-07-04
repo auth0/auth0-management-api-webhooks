@@ -16,13 +16,6 @@ module.exports = (storage) =>
       return next();
     }
 
-    const webhookReport = {
-      calls: 0,
-      success: 0,
-      failed: 0,
-      errors: []
-    };
-
     const onLogsReceived = (logs, callback) => {
       if (!logs || !logs.length) {
         return callback();
@@ -60,8 +53,6 @@ module.exports = (storage) =>
       logger.info(`Sending to '${url}' with ${concurrentCalls} concurrent calls.`);
 
       async.eachLimit(filteredLogs, concurrentCalls, (log, cb) => {
-        webhookReport.calls++;
-
         Request({
           method: 'POST',
           url: url,
@@ -69,18 +60,12 @@ module.exports = (storage) =>
           body: log
         }, (err, res, body) => {
           if (err || res.statusCode < 200 || res.statusCode >= 400) {
-            webhookReport.failed++;
-            webhookReport.errors.push(err || body || res.statusCode);
-          } else {
-            webhookReport.success++;
+            return cb(err || body || res.statusCode);
           }
 
-          cb();
+          return cb();
         });
-      }, () => {
-        logger.info(`${webhookReport.calls} requests processed.`)
-        callback();
-      });
+      }, callback);
     };
 
     const slack = new loggingTools.reporters.SlackReporter({
@@ -130,13 +115,6 @@ module.exports = (storage) =>
         })
     };
 
-    const updateReport = () =>
-      storage.read()
-        .then((data) => {
-          data.logs[data.logs.length - 1].webhookReport = webhookReport;
-          return storage.write(data);
-        });
-
     return auth0logger
       .run(onLogsReceived)
       .then(result => {
@@ -146,11 +124,8 @@ module.exports = (storage) =>
           slack.send(result.status, result.checkpoint);
         }
 
-        updateReport()
-          .then(() => {
-            checkReportTime();
-            res.json(result);
-          });
+        checkReportTime();
+        res.json(result);
       })
       .catch(err => {
         slack.send({ error: err, logsProcessed: 0 }, null);
