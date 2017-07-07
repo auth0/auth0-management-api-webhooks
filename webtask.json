@@ -30,6 +30,18 @@
     "WEBHOOK_URL":     {
       "required": true
     },
+    "SEND_AS_BATCH": {
+      "description": "If enabled, extension will send entire batch in one request. Otherwise, it will send requests one by one.",
+      "options": [
+        {
+          "value": "false",
+          "text": "Disabled"
+        },
+        {
+          "value": "true",
+          "text": "Enabled"
+        }]
+    },
     "WEBHOOK_CONCURRENT_CALLS":     {
       "description": "The maximum concurrent calls that will be made to your webhook",
       "default": 5
