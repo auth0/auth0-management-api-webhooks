@@ -91,7 +91,7 @@ module.exports = (storage) =>
       batchSize: parseInt(config('BATCH_SIZE')),
       startFrom: config('START_FROM'),
       logTypes: [ 'sapi', 'fapi' ],
-      serversideFiltering: config('AUTH0_RTA').replace('https://', '') === 'auth0.auth0.com'
+      enableServerSideFiltering: config('AUTH0_RTA').replace('https://', '') === 'auth0.auth0.com'
     };
 
     if (!options.batchSize || options.batchSize > 100) {
