@@ -90,8 +90,7 @@ module.exports = (storage) =>
       clientSecret: config('AUTH0_CLIENT_SECRET'),
       batchSize: parseInt(config('BATCH_SIZE')),
       startFrom: config('START_FROM'),
-      logTypes: [ 'sapi', 'fapi' ],
-      enableServerSideFiltering: config('AUTH0_RTA').replace('https://', '') === 'auth0.auth0.com'
+      logTypes: [ 'sapi', 'fapi' ]
     };
 
     if (!options.batchSize || options.batchSize > 100) {
