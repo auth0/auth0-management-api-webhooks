@@ -7,11 +7,14 @@ const htmlRoute = require('./html');
 
 module.exports = (storage) => {
   const app = router();
+  const rta = config('AUTH0_RTA').replace('https://', '');
+  const baseUrl = (rta === 'auth0.auth0.com') ? config('PUBLIC_WT_URL') : config('WT_URL');
+
   const authenticateAdmins = middlewares.authenticateAdmins({
     credentialsRequired: true,
     secret: config('EXTENSION_SECRET'),
     audience: 'urn:management-api-webhooks',
-    baseUrl: config('PUBLIC_WT_URL') || config('WT_URL'),
+    baseUrl,
     onLoginSuccess: (req, res, next) => next()
   });
 

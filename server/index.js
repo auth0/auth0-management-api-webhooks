@@ -39,12 +39,15 @@ module.exports = (configProvider, storageProvider) => {
   app.use(prepareBody(bodyParser.urlencoded({ extended: false })));
 
   // Configure routes.
+  const rta = config('AUTH0_RTA').replace('https://', '');
+  const baseUrl = (rta === 'auth0.auth0.com') ? config('PUBLIC_WT_URL') : config('WT_URL');
+
   app.use(expressTools.routes.dashboardAdmins({
     secret: config('EXTENSION_SECRET'),
     audience: 'urn:management-api-webhooks',
-    rta: config('AUTH0_RTA').replace('https://', ''),
     domain: config('AUTH0_DOMAIN'),
-    baseUrl: config('PUBLIC_WT_URL') || config('WT_URL'),
+    rta,
+    baseUrl,
     clientName: 'Management Api Webhooks',
     urlPrefix: '',
     sessionStorageKey: 'management-api-webhooks:apiToken'
