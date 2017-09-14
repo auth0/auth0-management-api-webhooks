@@ -12,7 +12,7 @@ const initialState = {
 };
 
 export const config = createReducer(fromJS(initialState), { // eslint-disable-line import/prefer-default-export
-  [constants.FETCH_CONFIGURATION_PENDING]: (state) =>
+  [constants.FETCH_CONFIGURATION_PENDING]: state =>
     state.merge({
       loading: true,
       record: { },
@@ -31,29 +31,29 @@ export const config = createReducer(fromJS(initialState), { // eslint-disable-li
       showNotification: data.showNotification
     });
   },
-  [constants.CLOSE_NOTIFICATION_PENDING]: (state) =>
+  [constants.CLOSE_NOTIFICATION_PENDING]: state =>
     state.merge({
       loading: true,
       showNotification: false
     }),
-  [constants.CLOSE_NOTIFICATION_REJECTED]: (state) =>
+  [constants.CLOSE_NOTIFICATION_REJECTED]: state =>
     state.merge({
       loading: false
     }),
-  [constants.CLOSE_NOTIFICATION_FULFILLED]: (state) =>
+  [constants.CLOSE_NOTIFICATION_FULFILLED]: state =>
     state.merge({
       loading: false
     }),
-  [constants.CONFIRM_NOTIFICATION_PENDING]: (state) =>
+  [constants.CONFIRM_NOTIFICATION_PENDING]: state =>
       state.merge({
         loading: true,
         showNotification: false
       }),
-  [constants.CONFIRM_NOTIFICATION_REJECTED]: (state) =>
+  [constants.CONFIRM_NOTIFICATION_REJECTED]: state =>
     state.merge({
       loading: false
     }),
-  [constants.CONFIRM_NOTIFICATION_FULFILLED]: (state) =>
+  [constants.CONFIRM_NOTIFICATION_FULFILLED]: state =>
     state.merge({
       loading: false,
       showNotification: false,

@@ -16,11 +16,11 @@ export const logs = createReducer(fromJS(initialState), { // eslint-disable-line
     state.merge({
       activeRecord: action.payload.log
     }),
-  [constants.CLEAR_LOG]: (state) =>
+  [constants.CLEAR_LOG]: state =>
     state.merge({
       activeRecord: null
     }),
-  [constants.FETCH_LOGS_PENDING]: (state) =>
+  [constants.FETCH_LOGS_PENDING]: state =>
     state.merge({
       loading: true,
       records: []

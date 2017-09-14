@@ -1,12 +1,12 @@
 const async = require('async');
 const moment = require('moment');
-const Request  = require('request');
+const Request = require('request');
 const loggingTools = require('auth0-log-extension-tools');
 
 const config = require('./config');
 const logger = require('./logger');
 
-module.exports = (storage) =>
+module.exports = storage =>
   (req, res, next) => {
     const wtBody = (req.webtaskContext && req.webtaskContext.body) || req.body || {};
     const wtHead = (req.webtaskContext && req.webtaskContext.headers) || {};
@@ -26,9 +26,9 @@ module.exports = (storage) =>
         url: url,
         json: true,
         body: data
-      }, (err, res, body) => {
-        if (err || res.statusCode < 200 || res.statusCode >= 400) {
-          return callback(err || body || res.statusCode);
+      }, (err, response, body) => {
+        if (err || response.statusCode < 200 || response.statusCode >= 400) {
+          return callback(err || body || response.statusCode);
         }
 
         return callback();
@@ -60,13 +60,11 @@ module.exports = (storage) =>
 
       const filteredLogs = logs
         .filter(requestMatchesFilter)
-        .map(log => {
-          return {
-            date: log.date,
-            request: log.details.request,
-            response: log.details.response
-          };
-        });
+        .map(log => ({
+          date: log.date,
+          request: log.details.request,
+          response: log.details.response
+        }));
 
       if (!filteredLogs.length) {
         return callback();
@@ -75,7 +73,7 @@ module.exports = (storage) =>
       logger.info(`${filteredLogs.length} logs found.`);
       logger.info(`Sending to '${url}' with ${concurrentCalls} concurrent calls.`);
 
-      callWebhook(filteredLogs, callback);
+      return callWebhook(filteredLogs, callback);
     };
 
     const slack = new loggingTools.reporters.SlackReporter({
@@ -88,7 +86,7 @@ module.exports = (storage) =>
       domain: config('AUTH0_DOMAIN'),
       clientId: config('AUTH0_CLIENT_ID'),
       clientSecret: config('AUTH0_CLIENT_SECRET'),
-      batchSize: parseInt(config('BATCH_SIZE')),
+      batchSize: parseInt(config('BATCH_SIZE'), 10),
       startFrom: config('START_FROM'),
       logTypes: [ 'sapi', 'fapi' ]
     };
@@ -122,12 +120,12 @@ module.exports = (storage) =>
           if (data.lastReportDate !== now && new Date().getHours() >= reportTime) {
             sendDailyReport(now);
           }
-        })
+        });
     };
 
     return auth0logger
       .run(onLogsReceived)
-      .then(result => {
+      .then((result) => {
         if (result && result.status && result.status.error) {
           slack.send(result.status, result.checkpoint);
         } else if (config('SLACK_SEND_SUCCESS') === true || config('SLACK_SEND_SUCCESS') === 'true') {
@@ -137,7 +135,7 @@ module.exports = (storage) =>
         checkReportTime();
         res.json(result);
       })
-      .catch(err => {
+      .catch((err) => {
         slack.send({ error: err, logsProcessed: 0 }, null);
         checkReportTime();
         next(err);

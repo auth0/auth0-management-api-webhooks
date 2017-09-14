@@ -1,3 +1,3 @@
 export App from './App.jsx';
-export LogsContainer from './LogsContainer';
-export RequireAuthentication from './RequireAuthentication';
+export LogsContainer from './LogsContainer.jsx';
+export RequireAuthentication from './RequireAuthentication.jsx';

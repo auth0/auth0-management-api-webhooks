@@ -1,4 +1,3 @@
-const url = require('url');
 const path = require('path');
 const morgan = require('morgan');
 const Express = require('express');
@@ -25,7 +24,7 @@ module.exports = (configProvider, storageProvider) => {
     stream: logger.stream
   }));
 
-  const prepareBody = (middleware) =>
+  const prepareBody = middleware =>
     (req, res, next) => {
       if (req.webtaskContext && req.webtaskContext.body) {
         req.body = req.webtaskContext.body;
@@ -45,7 +44,7 @@ module.exports = (configProvider, storageProvider) => {
     audience: 'urn:management-api-webhooks',
     domain: config('AUTH0_DOMAIN'),
     rta: config('AUTH0_RTA').replace('https://', ''),
-    baseUrl: config('WT_URL'),
+    baseUrl: config('PUBLIC_WT_URL') || config('WT_URL'),
     clientName: 'Management Api Webhooks',
     urlPrefix: '',
     sessionStorageKey: 'management-api-webhooks:apiToken'

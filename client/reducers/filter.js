@@ -8,9 +8,8 @@ const initialState = {
 };
 
 export const filter = createReducer(fromJS(initialState), { // eslint-disable-line import/prefer-default-export
-  [constants.SET_FILTER]: (state, action) => {
-    return state.merge({
+  [constants.SET_FILTER]: (state, action) =>
+    state.merge({
       status: action.payload.status
-    });
-  }
+    })
 });

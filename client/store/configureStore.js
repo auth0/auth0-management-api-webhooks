@@ -5,7 +5,7 @@ import { compose, createStore, applyMiddleware } from 'redux';
 
 import rootReducer from '../reducers';
 import normalizeErrorMiddleware from '../middlewares/normalizeErrorMiddleware';
-import DevTools from '../containers/DevTools';
+import DevTools from '../containers/DevTools.jsx';
 
 const nextRootReducer = ((process.env.NODE_ENV !== 'production' && module.hot)) ? require('../reducers') : null;
 
