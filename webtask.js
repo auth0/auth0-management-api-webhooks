@@ -4,9 +4,9 @@ const expressApp = require('./server');
 const config = require('./server/lib/config');
 const logger = require('./server/lib/logger');
 
-const createServer = tools.createServer((config, storage) => {
+const createServer = tools.createServer((cfg, storage) => {
   logger.info('Starting Management API Webhooks extension - Version:', process.env.CLIENT_VERSION);
-  return expressApp(config, storage);
+  return expressApp(cfg, storage);
 });
 
 module.exports = (context, req, res) => {

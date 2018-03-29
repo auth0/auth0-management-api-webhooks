@@ -1,4 +1,3 @@
-const url = require('url');
 const path = require('path');
 const morgan = require('morgan');
 const Express = require('express');
@@ -25,7 +24,7 @@ module.exports = (configProvider, storageProvider) => {
     stream: logger.stream
   }));
 
-  const prepareBody = (middleware) =>
+  const prepareBody = middleware =>
     (req, res, next) => {
       if (req.webtaskContext && req.webtaskContext.body) {
         req.body = req.webtaskContext.body;
@@ -39,11 +38,12 @@ module.exports = (configProvider, storageProvider) => {
   app.use(prepareBody(bodyParser.urlencoded({ extended: false })));
 
   // Configure routes.
+
   app.use(expressTools.routes.dashboardAdmins({
     secret: config('EXTENSION_SECRET'),
     audience: 'urn:management-api-webhooks',
-    rta: config('AUTH0_RTA').replace('https://', ''),
     domain: config('AUTH0_DOMAIN'),
+    rta: config('AUTH0_RTA').replace('https://', ''),
     baseUrl: config('PUBLIC_WT_URL') || config('WT_URL'),
     clientName: 'Management Api Webhooks',
     urlPrefix: '',
