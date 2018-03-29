@@ -52,10 +52,8 @@ module.exports = (storage) =>
 
       const requestMatchesFilter = (log) => {
         if (!endpointsFilter || !endpointsFilter.length) return true;
-        return log.details.request && log.details.request.path &&
-          endpointsFilter.some(filter =>
-          log.details.request.path === `/api/v2/${filter}`
-          || log.details.request.path.indexOf(`/api/v2/${filter}/`) >= 0);
+        const path = log.details.request && log.details.request.path;
+        return path && endpointsFilter.some(filter => path.indexOf(`/api/v2/${filter}`) >= 0);
       };
 
       const filteredLogs = logs
@@ -104,7 +102,7 @@ module.exports = (storage) =>
       const current = new Date();
 
       const end = current.getTime();
-      const start = end - 86400000;
+      const start = moment(end).subtract(1, 'day');
       auth0logger.getReport(start, end)
         .then(report => slack.send(report, report.checkpoint))
         .then(() => storage.read())

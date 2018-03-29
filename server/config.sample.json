@@ -1,0 +1,14 @@
+{
+  "EXTENSION_SECRET": "any string",
+  "WT_URL": "http://localhost:3000",
+  "PUBLIC_WT_URL": "http://localhost:3000",
+  "AUTH0_DOMAIN": "tenant-name.eu.auth0.com",
+  "AUTH0_RTA": "auth0.auth0.com",
+  "AUTH0_CLIENT_ID": "AUTH0_CLIENT_ID",
+  "AUTH0_CLIENT_SECRET": "AUTH0_CLIENT_SECRET",
+  "BATCH_SIZE": 100,
+  "WEBHOOK_URL": "http://localhost:8000",
+  "SEND_AS_BATCH": true,
+  "AUTH0_API_ENDPOINTS": "users,connections,whatever"
+}
+
