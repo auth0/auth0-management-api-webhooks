@@ -11,7 +11,11 @@
     "lint:js": "eslint --ignore-path .gitignore --ignore-pattern build --ignore-pattern webpack .",
     "serve:dev": "cross-env NODE_ENV=development gulp run --gulpfile ./build/gulpfile.js",
     "serve:prod": "cross-env NODE_ENV=production node index.js",
-    "tag": "git tag $npm_package_version && git push --tags"
+    "tag": "git tag $npm_package_version && git push --tags",
+    "test": "npm run test:pre && cross-env NODE_ENV=test mocha ./tests/mocha.js ./tests/**/*.tests.js",
+    "test:watch": "npm run test:pre && cross-env NODE_ENV=test mocha ./tests/mocha.js ./tests/**/*.tests.js --watch",
+    "test:pre": "npm run test:clean",
+    "test:clean": "rimraf ./coverage && rimraf ./.nyc_output"
   },
   "repository": {
     "type": "git",
@@ -145,6 +149,7 @@
     "imports-loader": "^0.6.5",
     "json-loader": "^0.5.4",
     "mocha": "^3.1.2",
+    "nock": "^9.0.11",
     "ngrok": "^2.2.9",
     "nodemon": "^1.9.2",
     "nyc": "^8.3.1",
