@@ -28,7 +28,8 @@
       "example": "e.g.: users, connections, rules, logs, emails, stats, clients, tenants"
     },
     "WEBHOOK_URL":     {
-      "required": true
+      "required": true,
+      "type": "text"
     },
     "SEND_AS_BATCH": {
       "description": "If enabled, extension will send entire batch in one request. Otherwise, it will send requests one by one.",
