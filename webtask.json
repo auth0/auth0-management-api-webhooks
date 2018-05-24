@@ -33,6 +33,11 @@
       "required": true,
       "type": "text"
     },
+    "AUTHORIZATION": {
+      "description": "Authorization Header (optional).",
+      "example": "Basic dm9yZGVsOnZvcmRlbA==",
+      "type": "text"
+    },
     "SEND_AS_BATCH": {
       "description": "If enabled, extension will send entire batch in one request. Otherwise, it will send requests one by one.",
       "type": "select",
