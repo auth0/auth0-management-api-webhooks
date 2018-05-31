@@ -19,12 +19,14 @@ module.exports = storage =>
     const url = config('WEBHOOK_URL');
     const batchMode = config('SEND_AS_BATCH') === true || config('SEND_AS_BATCH') === 'true';
     const concurrentCalls = parseInt(config('WEBHOOK_CONCURRENT_CALLS'), 10) || 5;
+    const headers = config('AUTHORIZATION') ? { Authorization: config('AUTHORIZATION') } : {};
 
     const sendRequest = (data, callback) =>
       Request({
         method: 'POST',
         url: url,
         json: true,
+        headers: headers,
         body: data
       }, (err, response, body) => {
         if (err || response.statusCode < 200 || response.statusCode >= 400) {

@@ -1,7 +1,7 @@
 {
   "title": "Auth0 Management API Webhooks",
   "name": "auth0-webhooks",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "auth0",
   "description": "Allows you to define webhooks for Auth0's Management API. It will go through the audit logs and call a webhook for specific events.",
   "type": "cron",
@@ -31,6 +31,11 @@
     },
     "WEBHOOK_URL":     {
       "required": true,
+      "type": "text"
+    },
+    "AUTHORIZATION": {
+      "description": "Authorization Header (optional).",
+      "example": "Basic dm9yZGVsOnZvcmRlbA==",
       "type": "text"
     },
     "SEND_AS_BATCH": {
