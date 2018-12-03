@@ -27,7 +27,7 @@
     },
     "AUTH0_API_ENDPOINTS": {
       "description": "Allows you to filter specific API endpoints, comma separated.",
-      "example": "e.g.: users, connections, rules, logs, emails, stats, clients, tenants"
+      "example": "e.g.: users, connections, rules, emails, stats, clients, tenants"
     },
     "WEBHOOK_URL":     {
       "required": true,
