@@ -42,15 +42,15 @@
       "description": "If enabled, extension will send entire batch in one request. Otherwise, it will send requests one by one.",
       "type": "select",
       "allowMultiple": false,
-      "default": "false",
+      "default": "true",
       "options": [
-        {
-          "value": "false",
-          "text": "Disabled"
-        },
         {
           "value": "true",
           "text": "Enabled"
+        },
+        {
+          "value": "false",
+          "text": "Disabled"
         }
       ]
     },
